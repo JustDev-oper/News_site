@@ -1,0 +1,22 @@
+{{ define "index" }}
+{{ template "header" }}
+<main class="container py-4">
+    <h1 class="mb-4">Последние новости</h1>
+    <div class="row">
+        {{ range . }}
+        <div class="col-md-6 col-lg-4">
+            <div class="article-card p-3">
+                <h3 class="h5">{{ .Title }}</h3>
+                <p class="text-muted">{{ .Anons }}</p>
+                <a href="/post/{{ .Id }}" class="btn btn-sm btn-outline-primary">Читать</a>
+            </div>
+        </div>
+        {{ else }}
+        <div class="col-12">
+            <p class="text-center text-muted">Статей пока нет</p>
+        </div>
+        {{ end }}
+    </div>
+</main>
+{{ template "footer" }}
+{{ end }}
