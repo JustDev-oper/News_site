@@ -21,9 +21,9 @@ func NewRepository(db *sql.DB) Repository {
 	return &repository{db: db}
 }
 
-func (db *repository) GetAllArticles() ([]models.Article, error) {
+func (repo *repository) GetAllArticles() ([]models.Article, error) {
 	var articles []models.Article
-	res, err := db.db.Query("SELECT * FROM `articles`")
+	res, err := repo.db.Query("SELECT * FROM `articles`")
 	if err != nil {
 		return nil, fmt.Errorf("error querying articles: %v", err)
 	}
@@ -45,8 +45,8 @@ func (db *repository) GetAllArticles() ([]models.Article, error) {
 	return articles, nil
 }
 
-func (db *repository) CreateArticle(article *models.Article) error {
-	_, err := db.db.Exec(
+func (repo *repository) CreateArticle(article *models.Article) error {
+	_, err := repo.db.Exec(
 		"INSERT INTO `articles` (`title`, `anons`, `full_text`) VALUES (?, ?, ?)",
 		article.Title,
 		article.Anons,
@@ -55,9 +55,9 @@ func (db *repository) CreateArticle(article *models.Article) error {
 	return err
 }
 
-func (db *repository) GetArticleByID(id uint16) (*models.Article, error) {
+func (repo *repository) GetArticleByID(id uint16) (*models.Article, error) {
 	var article models.Article
-	err := db.db.QueryRow(
+	err := repo.db.QueryRow(
 		"SELECT id, title, anons, full_text FROM `articles` WHERE `id` = ?",
 		id,
 	).Scan(

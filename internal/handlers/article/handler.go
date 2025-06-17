@@ -1,6 +1,7 @@
 package article
 
 import (
+	"News_site/internal/auth/middleware"
 	"News_site/internal/services/article"
 	"html/template"
 	"net/http"
@@ -17,6 +18,35 @@ func NewHandler(service article.Service) *Handler {
 	return &Handler{service: service}
 }
 
+// renderTemplate вспомогательная функция для рендеринга шаблонов
+func (h *Handler) renderTemplate(w http.ResponseWriter, r *http.Request, templateName string, data interface{}) {
+	// Получаем данные пользователя из контекста
+	user := middleware.GetUserFromContext(r.Context())
+
+	templateData := struct {
+		User *middleware.UserData
+		Data interface{}
+	}{
+		User: user,
+		Data: data,
+	}
+
+	temp, err := template.ParseFiles(
+		"web/templates/"+templateName+".html",
+		"web/templates/header.html",
+		"web/templates/footer.html",
+	)
+	if err != nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	if err := temp.ExecuteTemplate(w, templateName, templateData); err != nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+}
+
 func (handler *Handler) GetArticleByID(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.ParseUint(vars["id"], 10, 16)
@@ -31,16 +61,7 @@ func (handler *Handler) GetArticleByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	temp, err := template.ParseFiles("web/templates/showPost.html", "web/templates/header.html", "web/templates/footer.html")
-	if err != nil {
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
-	}
-
-	if err := temp.ExecuteTemplate(w, "showPost", articleById); err != nil {
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
-	}
+	handler.renderTemplate(w, r, "showPost", articleById)
 }
 
 func (handler *Handler) GetAllArticles(w http.ResponseWriter, r *http.Request) {
@@ -50,28 +71,11 @@ func (handler *Handler) GetAllArticles(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	temp, err := template.ParseFiles("web/templates/index.html", "web/templates/header.html", "web/templates/footer.html")
-	if err != nil {
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
-	}
-
-	if err := temp.ExecuteTemplate(w, "index", articles); err != nil {
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
-	}
+	handler.renderTemplate(w, r, "index", articles)
 }
 
 func (handler *Handler) CreateArticle(w http.ResponseWriter, r *http.Request) {
-	temp, err := template.ParseFiles("web/templates/create.html", "web/templates/header.html", "web/templates/footer.html")
-	if err != nil {
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
-	}
-	if err := temp.ExecuteTemplate(w, "create", nil); err != nil {
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
-	}
+	handler.renderTemplate(w, r, "createPost", nil)
 }
 
 func (handler *Handler) SaveArticle(w http.ResponseWriter, r *http.Request) {

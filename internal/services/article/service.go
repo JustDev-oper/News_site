@@ -28,7 +28,6 @@ func (s *service) GetAll() ([]models.Article, error) {
 }
 
 func (s *service) Create(title, anons, fullText string) error {
-	// Можно добавить бизнес-логику перед созданием
 	if title == "" || anons == "" || fullText == "" {
 		return errors.New("not all data has been filled in")
 	}
@@ -41,3 +40,5 @@ func (s *service) Create(title, anons, fullText string) error {
 
 	return s.repo.CreateArticle(&article)
 }
+
+// TODO: Сделать удаление и изменение постов, а так же привязать посты к пользователю, который их создал
