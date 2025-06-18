@@ -1,0 +1,64 @@
+{{ define "userPosts" }}
+{{ template "header" . }}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-4 mb-4">Мои посты</h1>
+            <p class="text-muted">Здесь отображаются все посты, которые вы создали</p>
+        </div>
+    </div>
+    <div class="row">
+        {{ range .Data }}
+        <div class="col-md-4 mb-4">
+            <div class="card article-card h-100">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold mb-3">{{ .Title }}</h5>
+                    <hr class="my-3">
+                    <p class="card-text text-muted">{{ .Anons }}</p>
+                    <div class="card-footer bg-transparent border-0 px-0 pb-0">
+                        <div class="d-flex justify-content-between align-items-center text-muted small mb-3">
+                            <span>
+                                <i class="bi bi-clock me-1"></i>{{ .CreatedAt.Format "02.01.2006" }}
+                            </span>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a href="/post/{{ .Id }}" class="btn btn-primary flex-fill">
+                                <i class="bi bi-eye me-2"></i>Просмотр
+                            </a>
+                            <button class="btn btn-outline-warning" onclick="editPost({{ .Id }})">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-outline-danger" onclick="deletePost({{ .Id }})">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{ else }}
+        <div class="col-12">
+            <div class="alert alert-info" role="alert">
+                <i class="bi bi-info-circle me-2"></i>У вас пока нет постов.
+                <a href="/create" class="alert-link">Создайте первый пост!</a>
+            </div>
+        </div>
+        {{ end }}
+    </div>
+</div>
+
+<script>
+    function editPost(id) {
+        // TODO: Реализовать редактирование поста
+        alert('Функция редактирования будет добавлена позже');
+    }
+
+    function deletePost(id) {
+        if (confirm('Вы уверены, что хотите удалить этот пост?')) {
+            // TODO: Реализовать удаление поста
+            alert('Функция удаления будет добавлена позже');
+        }
+    }
+</script>
+{{ template "footer" . }}
+{{ end }} 

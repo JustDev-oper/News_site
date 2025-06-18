@@ -7,7 +7,12 @@
                 <div class="card-body p-4">
                     <h1 class="card-title display-5 mb-4">{{ .Data.Title }}</h1>
                     <div class="text-muted mb-4">
-                        <i class="bi bi-clock me-2"></i>Опубликовано
+                        <i class="bi bi-clock me-2"></i>Опубликовано {{ .Data.CreatedAt.Format "02.01.2006 в 15:04" }}
+                        {{ if .Data.User }}
+                        <span class="ms-3">
+                            <i class="bi bi-person me-2"></i>Автор: {{ .Data.User.Username }}
+                        </span>
+                        {{ end }}
                     </div>
                     <div class="lead mb-4">{{ .Data.Anons }}</div>
                     <hr class="my-4">
