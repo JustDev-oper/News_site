@@ -11,6 +11,8 @@ type Service interface {
 	GetAll() ([]models.Article, error)
 	Create(title, anons, fullText string, userID uint) error
 	GetByUserID(userID uint) ([]models.Article, error)
+	Delete(id uint16) error
+	Update(id uint16, title, anons, fullText string, userID uint) error
 }
 
 type service struct {
@@ -27,6 +29,10 @@ func (s *service) GetByID(id uint16) (*models.Article, error) {
 
 func (s *service) GetAll() ([]models.Article, error) {
 	return s.repo.GetAllArticles()
+}
+
+func (s *service) GetByUserID(userID uint) ([]models.Article, error) {
+	return s.repo.GetArticlesByUserID(userID)
 }
 
 func (s *service) Create(title, anons, fullText string, userID uint) error {
@@ -49,8 +55,31 @@ func (s *service) Create(title, anons, fullText string, userID uint) error {
 	return s.repo.CreateArticle(&article)
 }
 
-func (s *service) GetByUserID(userID uint) ([]models.Article, error) {
-	return s.repo.GetArticlesByUserID(userID)
+func (s *service) Delete(id uint16) error {
+	return s.repo.DeleteArticle(id)
 }
 
-// TODO: Сделать удаление и изменение постов, а так же привязать посты к пользователю, который их создал
+func (s *service) Update(id uint16, title, anons, fullText string, userID uint) error {
+	if title == "" || anons == "" || fullText == "" {
+		return errors.New("not all data has been filled in")
+	}
+
+	if userID == 0 {
+		return errors.New("user ID is required")
+	}
+
+	article, err := s.GetByID(id)
+	if err != nil {
+		return err
+	}
+	
+	if article.UserID != userID {
+		return errors.New("access denied: article does not belong to user")
+	}
+
+	article.Title = title
+	article.Anons = anons
+	article.FullText = fullText
+	article.UserID = userID
+	return s.repo.UpdateArticle(article)
+}

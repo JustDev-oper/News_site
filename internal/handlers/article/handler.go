@@ -118,3 +118,90 @@ func (handler *Handler) GetUserArticles(w http.ResponseWriter, r *http.Request) 
 
 	handler.renderTemplate(w, r, "userPosts", articles)
 }
+
+func (handler *Handler) EditArticle(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.ParseUint(vars["id"], 10, 16)
+	if err != nil {
+		http.Error(w, "Invalid article ID", http.StatusBadRequest)
+		return
+	}
+
+	user := middleware.GetUserFromContext(r.Context())
+	if user == nil {
+		http.Error(w, "User not authenticated", http.StatusUnauthorized)
+		return
+	}
+
+	if r.Method == "GET" {
+
+		article, err := handler.service.GetByID(uint16(id))
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
+
+		if article.UserID != user.ID {
+			http.Error(w, "Access denied", http.StatusForbidden)
+			return
+		}
+
+		handler.renderTemplate(w, r, "editPost", article)
+		return
+	}
+
+	if r.Method == "POST" {
+		title := r.FormValue("title")
+		anons := r.FormValue("anons")
+		fullText := r.FormValue("full_text")
+
+		if err := handler.service.Update(uint16(id), title, anons, fullText, user.ID); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		http.Redirect(w, r, "/my-posts", http.StatusSeeOther)
+		return
+	}
+
+	http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+}
+
+func (handler *Handler) DeleteArticle(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	vars := mux.Vars(r)
+	id, err := strconv.ParseUint(vars["id"], 10, 16)
+	if err != nil {
+		http.Error(w, "Invalid article ID", http.StatusBadRequest)
+		return
+	}
+
+	user := middleware.GetUserFromContext(r.Context())
+	if user == nil {
+		http.Error(w, "User not authenticated", http.StatusUnauthorized)
+		return
+	}
+
+	// Проверяем, что статья принадлежит пользователю
+	article, err := handler.service.GetByID(uint16(id))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+
+	if article.UserID != user.ID {
+		http.Error(w, "Access denied", http.StatusForbidden)
+		return
+	}
+
+	if err := handler.service.Delete(uint16(id)); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(w, r, "/my-posts", http.StatusSeeOther)
+}

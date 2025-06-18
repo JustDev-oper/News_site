@@ -1,0 +1,47 @@
+{{ define "editPost" }}
+{{ template "header" . }}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="bi bi-pencil-square me-2"></i>Редактировать статью
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="/edit/{{ .Data.Id }}">
+                        <div class="mb-3">
+                            <label for="title" class="form-label fw-bold">Заголовок статьи</label>
+                            <input type="text" class="form-control" id="title" name="title" 
+                                   value="{{ .Data.Title }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="anons" class="form-label fw-bold">Анонс</label>
+                            <textarea class="form-control" id="anons" name="anons" rows="3" 
+                                      required>{{ .Data.Anons }}</textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="full_text" class="form-label fw-bold">Полный текст</label>
+                            <textarea class="form-control" id="full_text" name="full_text" rows="10" 
+                                      required>{{ .Data.FullText }}</textarea>
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle me-2"></i>Сохранить изменения
+                            </button>
+                            <a href="/my-posts" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>Отмена
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{ template "footer" . }}
+{{ end }} 

@@ -45,6 +45,8 @@ func main() {
 	r.HandleFunc("/create", articleHandler.CreateArticle).Methods("GET")
 	r.HandleFunc("/save_article", articleHandler.SaveArticle).Methods("POST")
 	r.HandleFunc("/my-posts", articleHandler.GetUserArticles).Methods("GET")
+	r.HandleFunc("/edit/{id:[0-9]+}", articleHandler.EditArticle).Methods("GET", "POST")
+	r.HandleFunc("/delete/{id:[0-9]+}", articleHandler.DeleteArticle).Methods("POST")
 
 	log.Printf("Server starting on port %s...", cfg.ServerPort)
 	if err := http.ListenAndServe(":"+cfg.ServerPort, r); err != nil {

@@ -12,6 +12,8 @@ type Repository interface {
 	GetAllArticles() ([]models.Article, error)
 	CreateArticle(article *models.Article) error
 	GetArticlesByUserID(userID uint) ([]models.Article, error)
+	DeleteArticle(id uint16) error
+	UpdateArticle(article *models.Article) error
 }
 
 type repository struct {
@@ -138,4 +140,24 @@ func (repo *repository) GetArticlesByUserID(userID uint) ([]models.Article, erro
 	}
 
 	return articles, nil
+}
+
+func (repo *repository) DeleteArticle(id uint16) error {
+	_, err := repo.db.Exec(
+		"DELETE FROM `articles` WHERE `id` = ?",
+		id,
+	)
+	return err
+}
+
+func (repo *repository) UpdateArticle(article *models.Article) error {
+	_, err := repo.db.Exec(
+		"UPDATE `articles` SET `title` = ?, `anons` = ?, `full_text` = ? WHERE `id` = ? AND `user_id` = ?",
+		article.Title,
+		article.Anons,
+		article.FullText,
+		article.Id,
+		article.UserID,
+	)
+	return err
 }

@@ -25,9 +25,9 @@
                             <a href="/post/{{ .Id }}" class="btn btn-primary flex-fill">
                                 <i class="bi bi-eye me-2"></i>Просмотр
                             </a>
-                            <button class="btn btn-outline-warning" onclick="editPost({{ .Id }})">
+                            <a href="/edit/{{ .Id }}" class="btn btn-outline-warning">
                                 <i class="bi bi-pencil"></i>
-                            </button>
+                            </a>
                             <button class="btn btn-outline-danger" onclick="deletePost({{ .Id }})">
                                 <i class="bi bi-trash"></i>
                             </button>
@@ -48,15 +48,14 @@
 </div>
 
 <script>
-    function editPost(id) {
-        // TODO: Реализовать редактирование поста
-        alert('Функция редактирования будет добавлена позже');
-    }
-
     function deletePost(id) {
         if (confirm('Вы уверены, что хотите удалить этот пост?')) {
-            // TODO: Реализовать удаление поста
-            alert('Функция удаления будет добавлена позже');
+            // Создаем форму для отправки POST запроса
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/delete/' + id;
+            document.body.appendChild(form);
+            form.submit();
         }
     }
 </script>
