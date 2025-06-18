@@ -19,6 +19,9 @@
                             <span>
                                 <i class="bi bi-clock me-1"></i>{{ .CreatedAt.Format "02.01.2006" }}
                             </span>
+                            <span>
+                                <i class="bi bi-heart me-1"></i>{{ .LikesCount }}
+                            </span>
                             {{ if .User }}
                             <span>
                                 <i class="bi bi-person me-1"></i>{{ .User.Username }}

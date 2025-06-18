@@ -12,11 +12,13 @@ func RenderTemplate(w http.ResponseWriter, r *http.Request, templateName string,
 	userFromContext := middleware.GetUserFromContext(r.Context())
 
 	templateData := struct {
-		User *middleware.UserData
-		Data interface{}
+		User        *middleware.UserData
+		CurrentUser *middleware.UserData
+		Data        interface{}
 	}{
-		User: userFromContext,
-		Data: data,
+		User:        userFromContext,
+		CurrentUser: userFromContext,
+		Data:        data,
 	}
 
 	temp, err := template.ParseFiles(

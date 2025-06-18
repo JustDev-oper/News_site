@@ -13,6 +13,10 @@ type Service interface {
 	GetByUserID(userID uint) ([]models.Article, error)
 	Delete(id uint16) error
 	Update(id uint16, title, anons, fullText string, userID uint) error
+	LikeArticle(userID uint, articleID uint16) error
+	UnlikeArticle(userID uint, articleID uint16) error
+	IsArticleLikedByUser(userID uint, articleID uint16) (bool, error)
+	GetLikesCount(articleID uint16) (int, error)
 }
 
 type service struct {
@@ -82,4 +86,20 @@ func (s *service) Update(id uint16, title, anons, fullText string, userID uint) 
 	article.FullText = fullText
 	article.UserID = userID
 	return s.repo.UpdateArticle(article)
+}
+
+func (s *service) LikeArticle(userID uint, articleID uint16) error {
+	return s.repo.LikeArticle(userID, articleID)
+}
+
+func (s *service) UnlikeArticle(userID uint, articleID uint16) error {
+	return s.repo.UnlikeArticle(userID, articleID)
+}
+
+func (s *service) IsArticleLikedByUser(userID uint, articleID uint16) (bool, error) {
+	return s.repo.IsArticleLikedByUser(userID, articleID)
+}
+
+func (s *service) GetLikesCount(articleID uint16) (int, error) {
+	return s.repo.GetLikesCount(articleID)
 }

@@ -12,4 +12,5 @@ type Article struct {
 	UserID    uint      `json:"user_id" db:"user_id"`
 	CreatedAt time.Time `json:"created_at" db:"created_at"`
 	User      *User     `json:"user,omitempty" db:"-"` // Связь с пользователем
+	LikesCount int `json:"likes_count" db:"-"`
 }

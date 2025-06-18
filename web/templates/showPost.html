@@ -24,10 +24,27 @@
                             <i class="bi bi-arrow-left me-2"></i>Назад к списку
                         </a>
                     </div>
+                    <div class="mt-3">
+                        <span id="likes-count">Лайков: {{ .Data.LikesCount }}</span>
+                        {{ if .CurrentUser }}
+                        <form id="like-form" method="POST" action="/post/{{ .Data.Id }}/like" style="display:inline;">
+                            <button type="submit" class="btn btn-outline-danger ms-2" id="like-btn">Лайк</button>
+                        </form>
+                        {{ end }}
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 {{ template "footer" . }}
+<script>
+document.getElementById('like-form')?.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const res = await fetch(this.action, { method: 'POST', credentials: 'same-origin' });
+    if (res.ok) {
+        location.reload();
+    }
+});
+</script>
 {{ end }}
