@@ -14,6 +14,10 @@ type Repository interface {
 	GetArticlesByUserID(userID uint) ([]models.Article, error)
 	DeleteArticle(id uint16) error
 	UpdateArticle(article *models.Article) error
+	LikeArticle(userID uint, articleID uint16) error
+	UnlikeArticle(userID uint, articleID uint16) error
+	IsArticleLikedByUser(userID uint, articleID uint16) (bool, error)
+	GetLikesCount(articleID uint16) (int, error)
 }
 
 type repository struct {
@@ -52,6 +56,10 @@ func (repo *repository) GetAllArticles() ([]models.Article, error) {
 			return nil, fmt.Errorf("error scanning article: %v", err)
 		}
 		article.User = &user
+		count, err := repo.GetLikesCount(article.Id)
+		if err == nil {
+			article.LikesCount = count
+		}
 		articles = append(articles, article)
 	}
 
@@ -100,6 +108,10 @@ func (repo *repository) GetArticleByID(id uint16) (*models.Article, error) {
 	}
 
 	article.User = &user
+	count, err := repo.GetLikesCount(article.Id)
+	if err == nil {
+		article.LikesCount = count
+	}
 	return &article, nil
 }
 
@@ -160,4 +172,26 @@ func (repo *repository) UpdateArticle(article *models.Article) error {
 		article.UserID,
 	)
 	return err
+}
+
+func (repo *repository) LikeArticle(userID uint, articleID uint16) error {
+	_, err := repo.db.Exec("INSERT IGNORE INTO likes (user_id, article_id) VALUES (?, ?)", userID, articleID)
+	return err
+}
+
+func (repo *repository) UnlikeArticle(userID uint, articleID uint16) error {
+	_, err := repo.db.Exec("DELETE FROM likes WHERE user_id = ? AND article_id = ?", userID, articleID)
+	return err
+}
+
+func (repo *repository) IsArticleLikedByUser(userID uint, articleID uint16) (bool, error) {
+	var count int
+	err := repo.db.QueryRow("SELECT COUNT(*) FROM likes WHERE user_id = ? AND article_id = ?", userID, articleID).Scan(&count)
+	return count > 0, err
+}
+
+func (repo *repository) GetLikesCount(articleID uint16) (int, error) {
+	var count int
+	err := repo.db.QueryRow("SELECT COUNT(*) FROM likes WHERE article_id = ?", articleID).Scan(&count)
+	return count, err
 }

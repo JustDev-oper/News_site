@@ -176,3 +176,36 @@ func (handler *Handler) DeleteArticle(w http.ResponseWriter, r *http.Request) {
 
 	http.Redirect(w, r, "/my-posts", http.StatusSeeOther)
 }
+
+func (handler *Handler) LikeArticleHandler(w http.ResponseWriter, r *http.Request) {
+	user := middleware.GetUserFromContext(r.Context())
+	if user == nil {
+		http.Error(w, "User not authenticated", http.StatusUnauthorized)
+		return
+	}
+
+	vars := mux.Vars(r)
+	id, err := strconv.ParseUint(vars["id"], 10, 16)
+	if err != nil {
+		http.Error(w, "Invalid article ID", http.StatusBadRequest)
+		return
+	}
+
+	liked, err := handler.service.IsArticleLikedByUser(user.ID, uint16(id))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if liked {
+		err = handler.service.UnlikeArticle(user.ID, uint16(id))
+	} else {
+		err = handler.service.LikeArticle(user.ID, uint16(id))
+	}
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
