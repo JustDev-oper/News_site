@@ -20,7 +20,7 @@ func NewHandler(service article.Service) *Handler {
 
 // renderTemplate вспомогательная функция для рендеринга шаблонов
 func (h *Handler) renderTemplate(w http.ResponseWriter, r *http.Request, templateName string, data interface{}) {
-	// Получаем данные пользователя из контекста
+
 	user := middleware.GetUserFromContext(r.Context())
 
 	templateData := struct {
@@ -84,14 +84,37 @@ func (handler *Handler) SaveArticle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	user := middleware.GetUserFromContext(r.Context())
+	if user == nil {
+		http.Error(w, "User not authenticated", http.StatusUnauthorized)
+		return
+	}
+
 	title := r.FormValue("title")
 	anons := r.FormValue("anons")
 	fullText := r.FormValue("full_text")
 
-	if err := handler.service.Create(title, anons, fullText); err != nil {
+	if err := handler.service.Create(title, anons, fullText, user.ID); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func (handler *Handler) GetUserArticles(w http.ResponseWriter, r *http.Request) {
+
+	user := middleware.GetUserFromContext(r.Context())
+	if user == nil {
+		http.Error(w, "User not authenticated", http.StatusUnauthorized)
+		return
+	}
+
+	articles, err := handler.service.GetByUserID(user.ID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	handler.renderTemplate(w, r, "userPosts", articles)
 }

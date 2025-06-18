@@ -44,6 +44,7 @@ func main() {
 	r.HandleFunc("/post/{id:[0-9]+}", articleHandler.GetArticleByID).Methods("GET")
 	r.HandleFunc("/create", articleHandler.CreateArticle).Methods("GET")
 	r.HandleFunc("/save_article", articleHandler.SaveArticle).Methods("POST")
+	r.HandleFunc("/my-posts", articleHandler.GetUserArticles).Methods("GET")
 
 	log.Printf("Server starting on port %s...", cfg.ServerPort)
 	if err := http.ListenAndServe(":"+cfg.ServerPort, r); err != nil {
