@@ -5,11 +5,12 @@ import (
 )
 
 type User struct {
-	ID        uint      `json:"id" gorm:"primaryKey"`
-	Email     string    `json:"email" gorm:"unique;not null"`
-	Password  string    `json:"-" gorm:"not null"` // "-" означает, что поле не будет сериализовано в JSON
-	Username  string    `json:"username" gorm:"unique;not null"`
-	CreatedAt time.Time `json:"created_at"`
+	ID        uint       `json:"id" gorm:"primaryKey"`
+	Email     string     `json:"email" gorm:"unique;not null"`
+	Password  string     `json:"-" gorm:"not null"` // "-" означает, что поле не будет сериализовано в JSON
+	Username  string     `json:"username" gorm:"unique;not null"`
+	CreatedAt time.Time  `json:"created_at"`
+	Articles  []Article  `json:"articles,omitempty" gorm:"foreignKey:UserID"` // Связь один ко многим с постами
 }
 
 type LoginRequest struct {
